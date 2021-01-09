@@ -48,8 +48,8 @@ generate_cert_with_ca("server", caKeyPath, caCrtPath, "localhost")
 @pytest.fixture(scope="class")
 def receptor_mesh(request):
 
-    node1 = subprocess.Popen(["receptor", "-c", "tests/mesh-definitions/mesh1/node1.yaml"])
-    node2 = subprocess.Popen(["receptor", "-c", "tests/mesh-definitions/mesh1/node2.yaml"])
+    node1 = subprocess.Popen(["receptor", "-c", "receptorctl/tests/mesh-definitions/mesh1/node1.yaml"])
+    node2 = subprocess.Popen(["receptor", "-c", "receptorctl/tests/mesh-definitions/mesh1/node2.yaml"])
 
     time.sleep(0.5)
     socketaddress = "unix://" + os.path.join(tmpDir, "node1.sock")
@@ -71,6 +71,7 @@ def receptor_mesh(request):
 @pytest.mark.usefixtures('receptor_mesh')
 class TestReceptorCTL:
     def test_simple_command(self):
+        pytest.fail("Test our failed test reporting")
         socketaddress = "unix://" + os.path.join(tmpDir, "node1.sock")
         node1_controller = ReceptorControl(socketaddress)
         status = node1_controller.simple_command("status")

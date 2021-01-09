@@ -39,6 +39,14 @@ jobs:
       - name: Run CI tasks in Docker
         run: "docker run --rm -v /home/runner/work/receptor/receptor:/home/test-user/receptor -v /tmp/receptor-testing:/tmp/receptor-testing -v /home/runner/.kube:/home/test-user/.kube -v /home/runner:/home/runner docker.pkg.github.com/$GITHUB_REPOSITORY/receptor-actions-ci-runner:latest"
 
+      - name: Install xpath
+        if: ${{ failure() }}
+        run: sudo apt-get install -y libxml-xpath-perl
+
+      - name: Extract failed test logs from the junit
+        if: ${{ failure() }}
+        run: "xpath -e '//testsuite[not(@failures=\"0\")]/testcase[failure]' *junit.xml"
+
       - name: Remove sockets for artifacting
         if: ${{ failure() }}
         run: "find /tmp/receptor-testing -type s -exec /bin/rm {} \\;"
@@ -52,4 +60,7 @@ jobs:
         if: ${{ failure() }}
         with:
           name: test-logs
-          path: /tmp/receptor-testing
+          path: |
+              /tmp/receptor-testing
+              /home/runner/work/receptor/receptor/*junit.xml
+              /home/runner/work/receptor/receptor/test-output.log
