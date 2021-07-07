@@ -11,11 +11,13 @@ cp -r ${SOURCE_DIR}/ ${BUILD_DIR}
 
 # Build receptor
 cd ${BUILD_DIR}
+make clean # prevent fail on dev environment
 make receptor
 
 # Build receptorctl
 cd ${BUILD_DIR}/receptorctl
-python3 -m build
+source /opt/venv/bin/activate # uses the currect Python version
+python -m build
 
 # Move packages
 mkdir -p ${ARTIFACTS_DIR}/dist

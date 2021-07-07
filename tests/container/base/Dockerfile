@@ -1,13 +1,29 @@
-FROM fedora:34
+FROM centos:8
 
 ARG GOLANG_VERSION=1.15.7
+ARG PYTHON_VERSION=3.8.7
 
 RUN set -x \
     && echo 'fastestmirror=True' >> /etc/dnf/dnf.conf \
     && dnf -y update \
-    && dnf -y install git wget python3 python3-pip python3-pyyaml make iproute openssl findutils \
-    && dnf clean all \
-    && pip3 install pre-commit
+    && dnf -y install \
+        # Receptor build tools
+        git wget make iproute openssl findutils virtualenv \
+        # Python build requirements
+        gcc zlib-devel bzip2 bzip2-devel readline-devel sqlite \
+        sqlite-devel openssl-devel tk-devel libffi-devel xz-devel \
+    && dnf clean all
+
+# Install specific python version
+RUN set -x \
+    && cd /tmp \
+    && wget -q https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz \
+    && tar -zxf Python-${PYTHON_VERSION}.tgz \
+    && cd Python-${PYTHON_VERSION} \
+    && ./configure \
+    && make altinstall \
+    && cd / \
+    && rm -rf /tmp/Python-${PYTHON_VERSION}
 
 # Install specific golang version
 ENV PATH=${PATH}:/usr/local/go/bin
@@ -32,6 +48,8 @@ RUN set -x \
     && go get -u golang.org/x/lint/golint \
     && go get -d -v ./... \
     # Python
+    && virtualenv -p python$(echo ${PYTHON_VERSION} | rev | cut -d'.' -f2- | rev) /opt/venv \
+    && source /opt/venv/bin/activate \
     && pip3 install -r requirements.txt \
     && pip3 install -r test-requirements.txt \
     && pip3 install --upgrade -r build-requirements.txt
@@ -41,13 +59,3 @@ ADD ./tests/container/base/build-artifacts.sh /
 RUN chmod +x /build-artifacts.sh
 
 WORKDIR /
-
-# Use Python 3.8.x
-
-# Build Receptor
-# ADD . .
-
-# RUN set -x \
-#     && make receptor \
-#     && cd ./receptorctl \
-#     && python3 -m build
