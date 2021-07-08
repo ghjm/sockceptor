@@ -1,6 +1,13 @@
 CONTAINER_IMAGE_TAG_BASE=ansible/receptor:base
 CONTAINER_IMAGE_TAG_TEST=ansible/receptor:test
 
+# Tests
+GO_FUNCTIONAL_TESTS_DIRS:=$$(find ./functional -type d)
+tests:
+	for f in $(GO_FUNCTIONAL_TESTS_DIRS) ; do \
+		go test -v $$f ; \
+	done
+
 # Generate artifacts
 artifacts: container-image-base
 	mkdir -p $(PWD)/artifacts
