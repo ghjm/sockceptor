@@ -1,7 +1,10 @@
 FROM centos:8
 
+# Python options = [3.8, 3.9]
+ARG PYTHON_VERSION=3.8
 ARG GOLANG_VERSION=1.15.7
-ARG PYTHON_VERSION=3.8.7
+
+ENV PATH=${PATH}:/usr/local/go/bin
 
 RUN set -x \
     && echo 'fastestmirror=True' >> /etc/dnf/dnf.conf \
@@ -9,25 +12,12 @@ RUN set -x \
     && dnf -y install \
         # Receptor build tools
         git wget make iproute openssl findutils virtualenv \
-        # Python build requirements
-        gcc zlib-devel bzip2 bzip2-devel readline-devel sqlite \
-        sqlite-devel openssl-devel tk-devel libffi-devel xz-devel \
-    && dnf clean all
-
-# Install specific python version
-RUN set -x \
-    && cd /tmp \
-    && wget -q https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz \
-    && tar -zxf Python-${PYTHON_VERSION}.tgz \
-    && cd Python-${PYTHON_VERSION} \
-    && ./configure \
-    && make altinstall \
-    && cd / \
-    && rm -rf /tmp/Python-${PYTHON_VERSION}
-
-# Install specific golang version
-ENV PATH=${PATH}:/usr/local/go/bin
-RUN set -x \
+    # Install specific python version
+    && export PYTHON_PKG_NAME=python$(echo ${PYTHON_VERSION} | sed 's/\.//g') \
+    && dnf module install -y ${PYTHON_PKG_NAME} \
+    && dnf clean all \
+    && alternatives --set python /usr/bin/python${PYTHON_VERSION} \
+    # Install specific golang version
     && cd /tmp/ \
     && wget -q https://golang.org/dl/go${GOLANG_VERSION}.linux-amd64.tar.gz \
     && rm -rf /usr/local/go \
@@ -48,7 +38,7 @@ RUN set -x \
     && go get -u golang.org/x/lint/golint \
     && go get -d -v ./... \
     # Python
-    && virtualenv -p python$(echo ${PYTHON_VERSION} | rev | cut -d'.' -f2- | rev) /opt/venv \
+    && virtualenv -p python${PYTHON_VERSION} /opt/venv \
     && source /opt/venv/bin/activate \
     && pip3 install -r requirements.txt \
     && pip3 install -r test-requirements.txt \

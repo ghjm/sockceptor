@@ -6,18 +6,18 @@ image: image-base
 image-base:
 	podman build -t $(IMAGE_TAG_BASE) -f ./base/Dockerfile ../..
 
-image-test:
-	podman build -t $(IMAGE_TAG_BASE) -f ./test/Dockerfile ../..
+# image-test:
+# 	podman build -t $(IMAGE_TAG_BASE) -f ./test/Dockerfile ../..
 
 shell-base:
 	podman run -it --rm \
 		-v $(PWD)/../../:/source/:ro \
 		$(IMAGE_TAG_BASE) bash
 
-shell-test:
-	podman run -it --rm \
-		-v $(PWD)/../../:/source/:ro \
-		$(IMAGE_TAG_BASE) bash
+# shell-test:
+# 	podman run -it --rm \
+# 		-v $(PWD)/../../:/source/:ro \
+# 		$(IMAGE_TAG_BASE) bash
 
 artifacts: image-base
 	mkdir -p $(PWD)/artifacts
