@@ -1,0 +1,56 @@
+# Install Receptor on CentOS 8
+---
+- hosts: all
+  become: yes
+  tasks:
+    # Dependencies
+    - name: Ensure latest git is installed.
+      yum: name=git state=latest
+    - name: Ensure latest go is installed.
+      yum: name=go state=latest
+    - name: Ensure latest python-pip is installed.
+      yum: name=python3-pip state=latest
+    - name: Ensure latest podman is installed.
+      yum: name=podman state=latest
+    - name: Ensure latest [pip] pbr is installed.
+      pip: name=pbr state=latest
+    - name: Ensure latest epel is installed.
+      yum: name=epel-release state=latest
+      
+
+    # # Build
+    # - name: Clone Receptor repo
+    #   git: repo=https://github.com/ansible/receptor.git
+    #        dest=/vagrant/receptor
+    #        accept_hostkey=yes
+    #        force=yes
+    #        recursive=no
+    # - name: Build Receptor
+    #   make:
+    #     chdir: /vagrant/receptor
+    # - name: Creates dist directory
+    #   file:
+    #     path: /vagrant/receptor/dist
+    #     state: directory
+
+    # # Move receptor binary to ./dist/ dir
+    # - name: Check new receptor binary exists
+    #   stat: path=/vagrant/receptor/receptor
+    #   register: receptor_binary_stat
+    # - name: Copy receptor binary file to ./dist/ dir
+    #   copy: remote_src=True src=/vagrant/receptor/receptor dest=/vagrant/receptor/dist/
+    #   when: receptor_binary_stat.stat.exists
+    # - name: Remove old files foo
+    #   file: path=/vagrant/receptor/receptor state=absent
+    #   when: receptor_binary_stat.stat.exists
+    # - name: Make receptor binary executable
+    #   file:
+    #     dest: /vagrant/receptor/dist/receptor
+    #     mode: a+x
+        
+    # # Update PATH var for vagrant user
+    # - name: line insert
+    #   lineinfile:
+    #     path: /home/vagrant/.bashrc
+    #     line: 'export PATH=${PATH}:/vagrant/receptor/dist'
+    #     insertbefore: BOF
