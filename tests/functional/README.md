@@ -1,4 +1,4 @@
-# Receptor Test Docs
+# Receptor Functional Test Docs
 
 This document will serve as a reference for how the upstream receptor tests
 work. This will cover both high level and low level details of how the tests
