@@ -1,4 +1,3 @@
-.DS_Store
 .idea
 receptor
 receptor.exe
@@ -17,3 +16,4 @@ kubectl
 /receptor-python-worker/ChangeLog
 /receptor-python-worker/AUTHORS
 .vagrant/
+Dockerfile
