@@ -3,8 +3,6 @@ CONTAINER_IMAGE_TAG_TEST=ansible/receptor:test
 
 # Tests
 GO_FUNCTIONAL_TESTS_DIRS:=$$(find ./functional -type d)
-tests:
-	./receptor-tester.sh run-all
 
 # Generate artifacts
 artifacts: container-image-base

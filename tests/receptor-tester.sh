@@ -150,6 +150,10 @@ elif [[ $1 == "run-all" ]]; then
     shift
     f_run_all $@
     exit
+elif [[ $1 == "help" ]]; then
+    shift
+    f_help
+    exit
 else
     log_error "[ERROR] Command not supported!"
     f_help
