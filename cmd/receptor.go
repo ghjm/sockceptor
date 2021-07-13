@@ -73,7 +73,7 @@ func (cfg nullBackendCfg) Start(ctx context.Context) (chan netceptor.BackendSess
 
 // Run runs the action, in this case adding a null backend to keep the wait group alive
 func (cfg nullBackendCfg) Run() error {
-	err := netceptor.MainInstance.AddBackend(&nullBackendCfg{}, 1.0, nil)
+	err := netceptor.MainInstance.AddBackend(&nullBackendCfg{}, 1.0, nil, "nullBackendCfg")
 	if err != nil {
 		return err
 	}
@@ -101,7 +101,14 @@ func main() {
 		cl.AddRegisteredConfigTypes(appName)
 	}
 
-	err := cl.ParseAndRun(os.Args[1:], []string{"Init", "Prepare", "Run"}, cmdline.ShowHelpIfNoArgs)
+	osArgs := os.Args[1:]
+	// create closure with the passed in args to be ran during a reload
+	controlsvc.ReloadCL = func() error {
+		err := cl.ParseAndRun(osArgs, []string{"Reload"}, cmdline.ShowHelpIfNoArgs)
+		return err
+	}
+
+	err := cl.ParseAndRun(osArgs, []string{"Init", "Prepare", "Run"}, cmdline.ShowHelpIfNoArgs)
 	if err != nil {
 		fmt.Printf("Error: %s\n", err)
 		os.Exit(1)
@@ -117,6 +124,7 @@ func main() {
 		netceptor.MainInstance.BackendWait()
 		close(done)
 	}()
+
 	select {
 	case <-done:
 		if netceptor.MainInstance.BackendCount() > 0 {

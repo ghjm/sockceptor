@@ -276,7 +276,7 @@ func (cfg udpListenerCfg) Run() error {
 		logger.Error("Error creating listener %s: %s\n", address, err)
 		return err
 	}
-	err = netceptor.MainInstance.AddBackend(b, cfg.Cost, cfg.NodeCost)
+	err = netceptor.MainInstance.AddBackend(b, cfg.Cost, cfg.NodeCost, "")
 	if err != nil {
 		logger.Error("Error creating backend for %s: %s\n", address, err)
 		return err
@@ -307,7 +307,7 @@ func (cfg udpDialerCfg) Run() error {
 		logger.Error("Error creating peer %s: %s\n", cfg.Address, err)
 		return err
 	}
-	err = netceptor.MainInstance.AddBackend(b, cfg.Cost, nil)
+	err = netceptor.MainInstance.AddBackend(b, cfg.Cost, nil, cfg.Address)
 	if err != nil {
 		logger.Error("Error creating backend for %s: %s\n", cfg.Address, err)
 		return err

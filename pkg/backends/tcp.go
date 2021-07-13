@@ -81,7 +81,7 @@ func (b *TCPListener) Addr() net.Addr {
 	return b.li.Addr()
 }
 
-// Start runs the given session function over the WebsocketListener backend
+// Start runs the given session function over the TCPListener backend
 func (b *TCPListener) Start(ctx context.Context) (chan netceptor.BackendSession, error) {
 	sessChan, err := listenerSession(ctx,
 		func() error {
@@ -244,7 +244,7 @@ func (cfg tcpListenerCfg) Run() error {
 		logger.Error("Error creating listener %s: %s\n", address, err)
 		return err
 	}
-	err = netceptor.MainInstance.AddBackend(b, cfg.Cost, cfg.NodeCost)
+	err = netceptor.MainInstance.AddBackend(b, cfg.Cost, cfg.NodeCost, "")
 	if err != nil {
 		return err
 	}
@@ -283,9 +283,19 @@ func (cfg tcpDialerCfg) Run() error {
 		logger.Error("Error creating peer %s: %s\n", cfg.Address, err)
 		return err
 	}
-	err = netceptor.MainInstance.AddBackend(b, cfg.Cost, nil)
+	err = netceptor.MainInstance.AddBackend(b, cfg.Cost, nil, cfg.Address)
 	if err != nil {
 		return err
+	}
+	return nil
+}
+
+func (cfg tcpDialerCfg) Reload() error {
+	if netceptor.MainInstance.InBackendCancel(cfg.Address) {
+		netceptor.MainInstance.UnmarkforCancel(cfg.Address)
+	} else {
+		cfg.Prepare()
+		cfg.Run()
 	}
 	return nil
 }
